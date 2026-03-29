@@ -55,6 +55,13 @@ app.use(
 );
 app.use(express.json());
 
+app.get('/', (req, res) => {
+  res.status(200).json({
+    message: 'SyncUp Booking API is running',
+    health: '/api/health',
+  });
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
