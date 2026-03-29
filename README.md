@@ -32,6 +32,69 @@ Full-stack scheduling app where admins create event types and availability, and 
 └─ prisma/           # Prisma schema + migrations
 ```
 
+### 1. Public Home (`/`)
+
+The public landing page that lists active booking links and introduces the booking flow (pick date, choose time, confirm details).
+
+![Public Home](https://github.com/user-attachments/assets/6e51cc42-afe0-4d53-8b13-4fe5f506dd23)
+
+---
+
+### 2. Login (`/login`)
+
+Admin sign-in page for existing users. Includes evaluator/demo credentials and a shortcut to the public booking page.
+
+![Login Page](https://github.com/user-attachments/assets/e41fb35a-1976-4d36-9ab4-8bfa0bbd75f3)
+
+---
+
+### 3. Register (`/register`)
+
+Admin account creation page with name, email, and password validation.
+
+![Register Page](https://github.com/user-attachments/assets/8525cc60-1b46-4081-ba1a-846315c8aee0)
+
+---
+
+### 4. Booking Page (`/book/:slug`, `/booking/:slug`, `/public/book/:slug`)
+
+Public scheduling page for a selected event type. Invitees pick a date/time, fill details, answer custom questions, and confirm booking.
+
+![Booking Page](https://github.com/user-attachments/assets/60a316a5-6e90-4cab-a2a9-f92c11b313f8)
+
+---
+
+### 5. Dashboard (`/dashboard`)
+
+Protected admin overview showing event metrics, quick booking-link access, and event type management shortcuts.
+
+![Dashboard](https://github.com/user-attachments/assets/32e745f2-5f35-4eee-bc1d-26eee0529edb)
+
+---
+
+### 6. Event Types (`/event-types`)
+
+Protected admin page to create, edit, delete, search, and share event types. Also supports custom questions and public link actions.
+
+![Event Types](https://github.com/user-attachments/assets/88ff9172-8ee7-4733-ba92-6791bbab6cb9)
+
+---
+
+### 7. Availability (`/availability`)
+
+Protected admin page to configure weekly working hours, date-specific overrides, and buffer times before/after meetings.
+
+![Availability](https://github.com/user-attachments/assets/22aaaaa9-0590-4ccc-ac60-76117488c57f)
+
+---
+
+### 8. Meetings (`/meetings`)
+
+Protected admin meetings manager with upcoming/past views, date-range filtering, and cancel actions.
+
+![Meetings](https://github.com/user-attachments/assets/9f0e3a08-f2e7-4f32-a96d-8f083f83301f)
+
+
 ## Setup Instructions
 
 ### 1. Prerequisites
