@@ -46,6 +46,16 @@ export default function PublicHome() {
   return (
     <div className="min-h-screen bg-[#f2f4f7] p-3 sm:p-6">
       <div className="relative mx-auto w-full max-w-[1360px] rounded-xl border border-slate-200 bg-white shadow-sm">
+        <div className="absolute left-4 top-4 z-20 sm:left-6 sm:top-6">
+          <Button
+            variant="outline"
+            className="border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+            onClick={() => navigate('/login')}
+          >
+            Admin Login
+          </Button>
+        </div>
+
         <div className="pointer-events-none absolute right-0 top-0 h-[130px] w-[130px] overflow-hidden rounded-tr-xl">
           <div className="absolute right-[-40px] top-[20px] rotate-45 bg-slate-600 px-10 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-white">
             Powered by SyncUp
