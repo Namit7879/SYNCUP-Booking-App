@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://syncup-booking-app-production.up.railway.app/api/$1"
+    }
+  ]
+}
