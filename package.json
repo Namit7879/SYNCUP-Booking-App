@@ -1,17 +1,7 @@
 {
   "name": "booking-app",
   "version": "1.0.0",
-  "description": "Booking app - monorepo",
   "scripts": {
-    "start": "cd server && npm start",
-    "build": "cd server && npm run build",
-    "dev": "concurrently \"cd client && npm run dev\" \"cd server && npm run dev\""
-  },
-  "devDependencies": {
-    "prisma": "^5.22.0",
-    "concurrently": "^8.2.1"
-  },
-  "dependencies": {
-    "@prisma/client": "^5.22.0"
+    "start": "cd server && npm start"
   }
 }
