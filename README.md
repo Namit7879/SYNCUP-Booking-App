@@ -122,7 +122,7 @@ JWT_SECRET="replace-with-a-long-random-secret"
 PORT=5000
 CLIENT_URL="http://localhost:5173"
 
-# Optional defaults for no-token admin mode
+#for Evaluator testing
 NO_LOGIN_ADMIN=true
 DEFAULT_ADMIN_EMAIL="adminuser123@gmail.com"
 DEFAULT_ADMIN_PASSWORD="admin123"
