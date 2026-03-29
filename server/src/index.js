@@ -17,6 +17,17 @@ const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
   .split(',')
   .map((origin) => origin.trim())
   .filter(Boolean);
+const allowVercelPreviews = process.env.ALLOW_VERCEL_PREVIEWS === 'true';
+
+function isAllowedVercelOrigin(origin) {
+  if (!allowVercelPreviews) return false;
+  try {
+    const hostname = new URL(origin).hostname;
+    return hostname.endsWith('.vercel.app');
+  } catch {
+    return false;
+  }
+}
 
 app.use(
   cors({
@@ -32,12 +43,22 @@ app.use(
         return;
       }
 
+      if (isAllowedVercelOrigin(origin)) {
+        callback(null, true);
+        return;
+      }
+
       callback(new Error(`CORS blocked for origin: ${origin}`));
     },
     credentials: true,
   })
 );
 app.use(express.json());
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
 
 app.use('/api/auth', authRoutes);
 app.use('/api/event-types', eventTypeRoutes);
