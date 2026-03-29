@@ -1,0 +1,101 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 208 60% 98%;
+    --foreground: 220 31% 18%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 31% 18%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 31% 18%;
+    --primary: 213 84% 46%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 204 45% 94%;
+    --secondary-foreground: 220 31% 18%;
+    --muted: 205 44% 95%;
+    --muted-foreground: 217 15% 44%;
+    --accent: 159 49% 91%;
+    --accent-foreground: 160 68% 23%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 212 34% 88%;
+    --input: 212 34% 88%;
+    --ring: 213 84% 46%;
+    --radius: 0.85rem;
+  }
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Manrope', sans-serif;
+    background-image:
+      radial-gradient(1050px circle at 0% 0%, rgba(36, 117, 255, 0.15), transparent 55%),
+      radial-gradient(900px circle at 100% 0%, rgba(15, 199, 130, 0.11), transparent 45%),
+      linear-gradient(to bottom, #f6fbff 0%, #edf3ff 100%);
+    background-attachment: fixed;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: 'Space Grotesk', sans-serif;
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer components {
+  .surface-card {
+    @apply rounded-2xl border border-white/80 bg-white/85 shadow-sm backdrop-blur-sm;
+  }
+
+  .nav-pill {
+    @apply rounded-xl transition-all duration-300;
+  }
+
+  .reveal-up {
+    animation: revealUp 600ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+}
+
+@keyframes revealUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
