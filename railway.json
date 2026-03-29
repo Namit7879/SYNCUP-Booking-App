@@ -1,4 +1,3 @@
 {
-  "buildCommand": "cd server && npm install && npm run prisma:generate",
-  "startCommand": "cd server && npm start"
+  "startCommand": "cd server && npm install && npm start"
 }
