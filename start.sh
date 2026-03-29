@@ -1,5 +1,0 @@
-#!/bin/bash
-cd server
-npm install
-npm run prisma:generate
-npm start
