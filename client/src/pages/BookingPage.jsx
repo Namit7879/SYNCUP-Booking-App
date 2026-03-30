@@ -59,17 +59,10 @@ export default function BookingPage() {
     try {
       const dateStr = format(date, 'yyyy-MM-dd');
       const res = await api.get(`/bookings/slots/${slug}?date=${dateStr}`);
-      const normalizedSlots = (res.data || []).map((slot) => {
-        // Convert backend UTC times to local timezone
-        const startTimeLocal = new Date(slot.startTime);
-        const endTimeLocal = new Date(slot.endTime);
-        return {
-          ...slot,
-          startTimeLocal,
-          endTimeLocal,
-          isAvailable: slot.isAvailable ?? true,
-        };
-      });
+      const normalizedSlots = (res.data || []).map((slot) => ({
+        ...slot,
+        isAvailable: slot.isAvailable ?? true,
+      }));
       setSlots(normalizedSlots);
     } catch {
       setSlotsError('Could not load time slots right now. Please try another date.');
@@ -145,7 +138,7 @@ export default function BookingPage() {
         slug: eventType.slug,
         inviteeName: formData.name,
         inviteeEmail: formData.email,
-        startTime: selectedSlot.startTime, // Keep UTC for backend
+        startTime: selectedSlot.startTime,
         notes: guestEmailLine ? `Guest emails: ${guestEmailLine}` : undefined,
         answers: eventType.customQuestions?.map((q, i) => ({
           question: q.question,
@@ -189,7 +182,7 @@ export default function BookingPage() {
   }
 
   if (confirmation) {
-    const startLocal = confirmation?.startTime ? new Date(confirmation.startTime) : null;
+    const start = confirmation?.startTime ? parseISO(confirmation.startTime) : null;
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#f2f4f7] p-4">
         <Card className="w-full max-w-md rounded-2xl border-slate-200 shadow-sm">
@@ -204,15 +197,15 @@ export default function BookingPage() {
                 <CalendarCheck className="h-4 w-4 text-primary" />
                 <span className="font-medium">{eventType?.title}</span>
               </div>
-              {startLocal && (
+              {start && (
                 <>
                   <div className="flex items-center gap-3 text-sm">
                     <span className="text-muted-foreground w-16">Date:</span>
-                    <span>{format(startLocal, 'EEEE, MMMM d, yyyy')}</span>
+                    <span>{format(start, 'EEEE, MMMM d, yyyy')}</span>
                   </div>
                   <div className="flex items-center gap-3 text-sm">
                     <span className="text-muted-foreground w-16">Time:</span>
-                    <span>{format(startLocal, 'h:mm a')}</span>
+                    <span>{format(start, 'h:mm a')}</span>
                   </div>
                 </>
               )}
@@ -228,8 +221,8 @@ export default function BookingPage() {
     );
   }
 
-  const selectedStart = selectedSlot?.startTimeLocal || null;
-  const selectedEnd = selectedSlot?.endTimeLocal || null;
+  const selectedStart = selectedSlot?.startTime ? parseISO(selectedSlot.startTime) : null;
+  const selectedEnd = selectedSlot?.endTime ? parseISO(selectedSlot.endTime) : null;
 
   // ----------- Main Booking Page UI -----------
   return (
@@ -267,7 +260,7 @@ export default function BookingPage() {
                 {selectedStart && selectedEnd && (
                   <div className="flex items-start gap-3">
                     <CalendarDays className="mt-0.5 h-5 w-5" />
-                    <span>{format(selectedStart, 'h:mm a')} - {format(selectedEnd, 'h:mm a')}, {format(selectedStart, 'EEEE, MMMM d, yyyy')}</span>
+                    <span>{format(selectedStart, 'HH:mm')} - {format(selectedEnd, 'HH:mm')}, {format(selectedStart, 'EEEE, MMMM d, yyyy')}</span>
                   </div>
                 )}
                 <div className="flex items-start gap-3">
