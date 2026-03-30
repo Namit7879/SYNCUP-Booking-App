@@ -31,7 +31,6 @@ import {
 export default function BookingPage() {
   const navigate = useNavigate();
   const { slug } = useParams();
-
   const [eventType, setEventType] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -49,9 +48,31 @@ export default function BookingPage() {
   const [submitError, setSubmitError] = useState(null);
   const [confirmation, setConfirmation] = useState(null);
 
-  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  // Get user's local timezone
+  const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  // ----------- Fetch Slots -----------
+  // Fetch Event Type
+  useEffect(() => {
+    const fetchEventType = async () => {
+      try {
+        const res = await api.get(`/bookings/public/${slug}`);
+        setEventType(res.data);
+        if (res.data.customQuestions) {
+          setFormData((prev) => ({
+            ...prev,
+            answers: res.data.customQuestions.map(() => ''),
+          }));
+        }
+      } catch {
+        setError('This booking link is no longer available or does not exist.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEventType();
+  }, [slug]);
+
+  // Fetch available slots
   const fetchSlots = useCallback(async (date) => {
     setLoadingSlots(true);
     setSlotsError(null);
@@ -72,31 +93,6 @@ export default function BookingPage() {
     }
   }, [slug]);
 
-  // ----------- Fetch Event Type -----------
-  useEffect(() => {
-    const fetchEventType = async () => {
-      try {
-        const res = await api.get(`/bookings/public/${slug}`);
-        setEventType(res.data);
-        if (res.data.customQuestions) {
-          setFormData((prev) => ({
-            ...prev,
-            answers: res.data.customQuestions.map(() => ''),
-          }));
-        }
-        const today = new Date();
-        setSelectedDate(today);
-        fetchSlots(today);
-      } catch {
-        setError('This booking link is no longer available or does not exist.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchEventType();
-  }, [slug, fetchSlots]);
-
-  // ----------- Handlers -----------
   const handleDateSelect = (date) => {
     if (isPast(date) && !isSameDay(date, new Date())) return;
     setSelectedDate(date);
@@ -149,13 +145,24 @@ export default function BookingPage() {
       const res = await api.post('/bookings', payload);
       setConfirmation(res.data);
     } catch (requestError) {
-      setSubmitError(requestError?.response?.data?.message || 'Failed to book meeting. Please try again.');
+      setSubmitError(requestError.response?.data?.message || 'Failed to book meeting. Please try again.');
     } finally {
       setSubmitting(false);
     }
   };
 
-  // ----------- Render Loading / Error / Confirmation -----------
+  // Format date/time to user's local timezone
+  const formatLocal = (isoString, options = {}) => {
+    if (!isoString) return '';
+    const date = parseISO(isoString);
+    return new Intl.DateTimeFormat(undefined, {
+      dateStyle: 'full',
+      timeStyle: 'short',
+      ...options,
+      timeZone: userTimezone,
+    }).format(date);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
@@ -182,7 +189,6 @@ export default function BookingPage() {
   }
 
   if (confirmation) {
-    const start = confirmation?.startTime ? parseISO(confirmation.startTime) : null;
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#f2f4f7] p-4">
         <Card className="w-full max-w-md rounded-2xl border-slate-200 shadow-sm">
@@ -197,18 +203,10 @@ export default function BookingPage() {
                 <CalendarCheck className="h-4 w-4 text-primary" />
                 <span className="font-medium">{eventType?.title}</span>
               </div>
-              {start && (
-                <>
-                  <div className="flex items-center gap-3 text-sm">
-                    <span className="text-muted-foreground w-16">Date:</span>
-                    <span>{format(start, 'EEEE, MMMM d, yyyy')}</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-sm">
-                    <span className="text-muted-foreground w-16">Time:</span>
-                    <span>{format(start, 'h:mm a')}</span>
-                  </div>
-                </>
-              )}
+              <div className="flex items-center gap-3 text-sm">
+                <span className="text-muted-foreground w-16">Date & Time:</span>
+                <span>{formatLocal(confirmation.startTime)}</span>
+              </div>
               <div className="flex items-center gap-3 text-sm">
                 <span className="text-muted-foreground w-16">With:</span>
                 <span>{formData.name}</span>
@@ -221,10 +219,9 @@ export default function BookingPage() {
     );
   }
 
-  const selectedStart = selectedSlot?.startTime ? parseISO(selectedSlot.startTime) : null;
-  const selectedEnd = selectedSlot?.endTime ? parseISO(selectedSlot.endTime) : null;
+  const selectedStart = selectedSlot?.startTime ? selectedSlot.startTime : null;
+  const selectedEnd = selectedSlot?.endTime ? selectedSlot.endTime : null;
 
-  // ----------- Main Booking Page UI -----------
   return (
     <div className="min-h-screen bg-[#f2f4f7] p-3 sm:p-6">
       <div className="mx-auto w-full max-w-[1360px]">
@@ -260,12 +257,12 @@ export default function BookingPage() {
                 {selectedStart && selectedEnd && (
                   <div className="flex items-start gap-3">
                     <CalendarDays className="mt-0.5 h-5 w-5" />
-                    <span>{format(selectedStart, 'HH:mm')} - {format(selectedEnd, 'HH:mm')}, {format(selectedStart, 'EEEE, MMMM d, yyyy')}</span>
+                    <span>{formatLocal(selectedStart)} - {formatLocal(selectedEnd, { timeStyle: 'short' })}</span>
                   </div>
                 )}
                 <div className="flex items-start gap-3">
                   <Globe className="mt-0.5 h-5 w-5" />
-                  <span>{timezone}</span>
+                  <span>{userTimezone}</span>
                 </div>
               </div>
             </aside>
@@ -291,7 +288,7 @@ export default function BookingPage() {
                           selectedSlot={selectedSlot}
                           loading={loadingSlots}
                           error={slotsError}
-                          timezoneLabel={timezone}
+                          timezoneLabel={userTimezone}
                           onSelectSlot={handleSlotSelect}
                         />
                       ) : (
