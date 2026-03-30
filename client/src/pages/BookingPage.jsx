@@ -31,6 +31,7 @@ import {
 export default function BookingPage() {
   const navigate = useNavigate();
   const { slug } = useParams();
+
   const [eventType, setEventType] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -47,28 +48,10 @@ export default function BookingPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
   const [confirmation, setConfirmation] = useState(null);
+
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  useEffect(() => {
-    const fetchEventType = async () => {
-      try {
-        const res = await api.get(`/bookings/public/${slug}`);
-        setEventType(res.data);
-        if (res.data.customQuestions) {
-          setFormData((prev) => ({
-            ...prev,
-            answers: res.data.customQuestions.map(() => ''),
-          }));
-        }
-      } catch {
-        setError('This booking link is no longer available or does not exist.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchEventType();
-  }, [slug]);
-
+  // ----------- Fetch Slots -----------
   const fetchSlots = useCallback(async (date) => {
     setLoadingSlots(true);
     setSlotsError(null);
@@ -89,6 +72,31 @@ export default function BookingPage() {
     }
   }, [slug]);
 
+  // ----------- Fetch Event Type -----------
+  useEffect(() => {
+    const fetchEventType = async () => {
+      try {
+        const res = await api.get(`/bookings/public/${slug}`);
+        setEventType(res.data);
+        if (res.data.customQuestions) {
+          setFormData((prev) => ({
+            ...prev,
+            answers: res.data.customQuestions.map(() => ''),
+          }));
+        }
+        const today = new Date();
+        setSelectedDate(today);
+        fetchSlots(today);
+      } catch {
+        setError('This booking link is no longer available or does not exist.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEventType();
+  }, [slug, fetchSlots]);
+
+  // ----------- Handlers -----------
   const handleDateSelect = (date) => {
     if (isPast(date) && !isSameDay(date, new Date())) return;
     setSelectedDate(date);
@@ -141,12 +149,13 @@ export default function BookingPage() {
       const res = await api.post('/bookings', payload);
       setConfirmation(res.data);
     } catch (requestError) {
-      setSubmitError(requestError.response?.data?.message || 'Failed to book meeting. Please try again.');
+      setSubmitError(requestError?.response?.data?.message || 'Failed to book meeting. Please try again.');
     } finally {
       setSubmitting(false);
     }
   };
 
+  // ----------- Render Loading / Error / Confirmation -----------
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
@@ -215,6 +224,7 @@ export default function BookingPage() {
   const selectedStart = selectedSlot?.startTime ? parseISO(selectedSlot.startTime) : null;
   const selectedEnd = selectedSlot?.endTime ? parseISO(selectedSlot.endTime) : null;
 
+  // ----------- Main Booking Page UI -----------
   return (
     <div className="min-h-screen bg-[#f2f4f7] p-3 sm:p-6">
       <div className="mx-auto w-full max-w-[1360px]">
